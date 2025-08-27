@@ -24,25 +24,31 @@ function App() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-4xl font-bold flex items-center gap-2">
-        🍕 Za Pizza POS
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-4xl font-bold flex items-center mb-6">
+        <span role="img" aria-label="pizza" className="mr-2">🍕</span>
+        Za Pizza POS
       </h1>
-      <h2 className="text-2xl font-semibold mt-4">Available Pizzas</h2>
 
-      {loading && <p>Loading pizzas...</p>}
+      <h2 className="text-2xl font-semibold mb-4">Available Pizzas</h2>
 
-      <ul className="mt-4 space-y-2">
-        {pizzas.map((pizza) => (
-          <li
-            key={pizza.id}
-            className="p-4 border rounded-lg shadow-sm flex justify-between items-center"
-          >
-            <span className="font-medium">{pizza.name}</span>
-            <span className="text-gray-600">${(pizza.price_cents / 100).toFixed(2)}</span>
-          </li>
-        ))}
-      </ul>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <ul className="space-y-4">
+          {pizzas.map((pizza) => (
+            <li
+              key={pizza.id}
+              className="bg-white shadow-md p-4 rounded-lg flex justify-between items-center"
+            >
+              <span className="text-lg font-medium">{pizza.name}</span>
+              <span className="text-gray-600">
+                ${(pizza.price_cents / 100).toFixed(2)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
