@@ -62,6 +62,14 @@ def list_customers(db: Session = Depends(get_db)):
     customers = db.scalars(select(models.Customer)).all()
     return customers
 
+@app.get("/customers/{customer_id}", response_model=schemas.CustomerDetailResponse)
+def get_customer(customer_id: int, db: Session = Depends(get_db)):
+    customer = db.get(models.Customer, customer_id)
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return customer
+
+
 # --------------------
 # Orders
 # --------------------
@@ -120,6 +128,37 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
             for i in new_order.items
         ],
     }
+@app.get("/orders", response_model=list[schemas.OrderListResponse])
+def list_orders(db: Session = Depends(get_db)):
+    orders = db.scalars(select(models.Order)).all()
+    return [
+        {
+            "order_id": o.id,
+            "number": o.number,
+            "total_cents": o.total_cents,
+            "status": o.status,
+        }
+        for o in orders
+    ]
+
+
+@app.get("/orders/{order_id}", response_model=schemas.OrderDetailResponse)
+def get_order(order_id: int, db: Session = Depends(get_db)):
+    order = db.get(models.Order, order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    return {
+        "order_id": order.id,
+        "number": order.number,
+        "total_cents": order.total_cents,
+        "status": order.status,
+        "items": [
+            {"pizza_id": i.pizza_id, "quantity": i.quantity, "line_total": i.line_total_cents}
+            for i in order.items
+        ],
+    }
+
 
 
 # --------------------
