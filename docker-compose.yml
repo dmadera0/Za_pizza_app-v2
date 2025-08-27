@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    container_name: za-pizza-postgres
+    environment:
+      POSTGRES_USER: pizza
+      POSTGRES_PASSWORD: pizza
+      POSTGRES_DB: za_pizza
+    ports:
+      - "5432:5432"         # exposes to localhost
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
