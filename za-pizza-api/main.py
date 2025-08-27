@@ -49,15 +49,18 @@ def list_pizzas(db: Session = Depends(get_db)):
 # --------------------
 # Customers
 # --------------------
-@app.post("/customers")
-def create_customer(name: str, db: Session = Depends(get_db)):
-    new_customer = models.Customer(name=name)
+@app.post("/customers", response_model=schemas.CustomerResponse)
+def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
+    new_customer = models.Customer(name=customer.name)
     db.add(new_customer)
     db.commit()
     db.refresh(new_customer)
-    return {"id": new_customer.id, "name": new_customer.name}
+    return new_customer
 
-
+@app.get("/customers", response_model=list[schemas.CustomerListResponse])
+def list_customers(db: Session = Depends(get_db)):
+    customers = db.scalars(select(models.Customer)).all()
+    return customers
 
 # --------------------
 # Orders

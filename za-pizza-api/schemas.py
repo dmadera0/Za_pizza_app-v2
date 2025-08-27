@@ -1,6 +1,20 @@
 from pydantic import BaseModel
 from typing import List
 
+class CustomerListResponse(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True   # allows returning SQLAlchemy models directly
+
+class CustomerCreate(BaseModel):
+    name: str
+
+class CustomerResponse(BaseModel):
+    id: int
+    name: str
+
 
 class OrderItemCreate(BaseModel):
     pizza_id: int
