@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchPizzas } from "../api";
 
 interface Pizza {
   id: number;
   name: string;
+  description: string;
   price: number;
-  description?: string;
 }
 
-export default function MenuPage() {
+const MenuPage: React.FC = () => {
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPizzas = async () => {
@@ -19,28 +20,44 @@ export default function MenuPage() {
         setPizzas(data);
       } catch (err) {
         console.error("Failed to fetch pizzas", err);
+        setError("Could not load menu. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-
     loadPizzas();
   }, []);
 
   if (loading) return <p>Loading menu...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <div className="max-w-2xl mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-4">Pizza Menu</h2>
-      <ul className="space-y-4">
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
+      <h1 style={{ textAlign: "center" }}>🍕 Pizza Menu</h1>
+      <div style={{ display: "grid", gap: "1.5rem", marginTop: "2rem" }}>
         {pizzas.map((pizza) => (
-          <li key={pizza.id} className="p-4 border rounded shadow">
-            <h3 className="text-xl font-semibold">{pizza.name}</h3>
-            {pizza.description && <p className="text-gray-600">{pizza.description}</p>}
-            <p className="font-bold">${pizza.price.toFixed(2)}</p>
-          </li>
+          <div
+            key={pizza.id}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              padding: "1rem",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+              backgroundColor: "#fff",
+            }}
+          >
+            <h2 style={{ margin: "0 0 0.5rem" }}>{pizza.name}</h2>
+            <p style={{ margin: "0 0 1rem", color: "#555" }}>
+              {pizza.description}
+            </p>
+            <strong style={{ fontSize: "1.1rem" }}>
+              ${pizza.price.toFixed(2)}
+            </strong>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
-}
+};
+
+export default MenuPage;
