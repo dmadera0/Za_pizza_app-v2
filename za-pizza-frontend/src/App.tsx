@@ -2,6 +2,7 @@ import { Link, Routes, Route } from "react-router-dom";
 import OrderNowPage from "./pages/OrderNowPage";
 import MenuPage from "./pages/MenuPage";
 import RecentOrdersPage from "./pages/RecentOrdersPage";
+import OrderPage from "./pages/OrderPage";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/order" element={<OrderNowPage />} />
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/recent-orders" element={<RecentOrdersPage />} />
+          <Route path="/order/:pizzaId" element={<OrderPage />} />
         </Routes>
       </div>
     </div>

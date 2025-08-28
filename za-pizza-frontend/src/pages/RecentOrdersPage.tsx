@@ -1,44 +1,71 @@
-import { useEffect, useState } from "react";
-import { getOrders } from "../api";
+import { useState, useEffect } from "react";
+import { createCustomer, createOrder, getPizzas } from "../api";
 
-interface Order {
-  order_id: number;
-  number: number;
-  total_cents: number;
-  status: string;
-  customer_name?: string; // ✅ new field from backend
+interface Pizza {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
 }
 
-export default function RecentOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+export default function OrderPage() {
+  const [name, setName] = useState("");
+  const [pizzas, setPizzas] = useState<Pizza[]>([]);
+  const [selectedPizza, setSelectedPizza] = useState<number | null>(null);
 
   useEffect(() => {
-    getOrders().then(setOrders).catch(console.error);
+    getPizzas().then(setPizzas).catch(console.error);
   }, []);
 
+  const handleSubmit = async () => {
+    try {
+      // Step 1: Create customer
+      const customer = await createCustomer({ name });
+
+      // Step 2: Create order with customer_id
+      await createOrder({
+        customer_id: customer.id,
+        items: [{ pizza_id: selectedPizza!, quantity: 1 }],
+      });
+
+      alert("✅ Order placed successfully!");
+    } catch (err) {
+      console.error("Order failed", err);
+      alert("❌ Something went wrong while placing your order.");
+    }
+  };
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Recent Orders</h1>
-      <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="py-3 px-4">Order #</th>
-            <th className="py-3 px-4">Customer</th>
-            <th className="py-3 px-4">Status</th>
-            <th className="py-3 px-4">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((o) => (
-            <tr key={o.order_id} className="border-t hover:bg-gray-50">
-              <td className="py-2 px-4">{o.number}</td>
-              <td className="py-2 px-4">{o.customer_name ?? "Unknown"}</td>
-              <td className="py-2 px-4">{o.status}</td>
-              <td className="py-2 px-4">${(o.total_cents / 100).toFixed(2)}</td>
-            </tr>
+    <div className="order-page">
+      <h2>🍕 Create Order</h2>
+
+      <label>
+        Your Name:
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter your name"
+        />
+      </label>
+
+      <label>
+        Select Pizza:
+        <select
+          value={selectedPizza ?? ""}
+          onChange={(e) => setSelectedPizza(Number(e.target.value))}
+        >
+          <option value="">-- Choose a pizza --</option>
+          {pizzas.map((pizza) => (
+            <option key={pizza.id} value={pizza.id}>
+              {pizza.name} (${pizza.price})
+            </option>
           ))}
-        </tbody>
-      </table>
+        </select>
+      </label>
+
+      <button onClick={handleSubmit} disabled={!name || !selectedPizza}>
+        ✅ Complete Order
+      </button>
     </div>
   );
 }

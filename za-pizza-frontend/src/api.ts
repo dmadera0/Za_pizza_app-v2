@@ -15,8 +15,10 @@ export async function createCustomer(data: { name: string }) {
 }
 
 // Create a new order
+// ✅ Updated createOrder to accept either customer_id or customer_name
 export async function createOrder(data: {
-  customer_id: number;
+  customer_id?: number;
+  customer_name?: string;
   items: { pizza_id: number; quantity: number }[];
 }) {
   const res = await axios.post(`${API_BASE}/orders`, data);
@@ -28,3 +30,4 @@ export async function getOrders() {
   const res = await axios.get(`${API_BASE}/orders`);
   return res.data;
 }
+
