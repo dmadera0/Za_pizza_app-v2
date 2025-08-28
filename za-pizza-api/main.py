@@ -11,6 +11,7 @@ from sqlalchemy import select
 import models
 import schemas
 from db import SessionLocal, engine
+from . import models, schemas
 
 # Create tables automatically (development only — in production, use Alembic migrations)
 models.Base.metadata.create_all(bind=engine)
@@ -46,12 +47,17 @@ def health():
 # --------------------
 @app.get("/pizzas")
 def list_pizzas(db: Session = Depends(get_db)):
-    pizzas = db.scalars(select(models.Pizza).where(models.Pizza.is_active == True)).all()
+    pizzas = db.scalars(select(models.Pizza)).all()
     return [
-        {"id": p.id, "name": p.name, "price_cents": p.base_price_cents}
+        {
+            "id": p.id,
+            "name": p.name,
+            "description": p.description,
+            "price": float(p.price),
+            "created_at": p.created_at
+        }
         for p in pizzas
     ]
-
 
 # --------------------
 # Customers

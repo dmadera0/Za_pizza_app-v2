@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 # Load environment variables from .env file
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://pizza:yourpassword@localhost:5432/za_pizza")
 
 # Create the engine with PostgreSQL
 engine = create_engine(DATABASE_URL, echo=True, future=True)

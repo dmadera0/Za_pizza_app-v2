@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
 
 class CustomerListResponse(BaseModel):
     id: int
@@ -72,6 +73,18 @@ class OrderDetailResponse(BaseModel):
     total_cents: int
     status: str
     items: List[OrderItemResponse]
+
+    class Config:
+        orm_mode = True
+
+class PizzaBase(BaseModel):
+    name: str
+    description: str
+    price: float
+
+class PizzaOut(PizzaBase):
+    id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True
