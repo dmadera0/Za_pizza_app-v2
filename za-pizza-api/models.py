@@ -7,8 +7,11 @@ Explicitly Python 3 ready.
 from datetime import datetime
 from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column, Integer, String, Text, DECIMAL, TIMESTAMP, func
+from sqlalchemy.orm import declarative_base
 from db import Base
 
+Base = declarative_base()
 
 class Customer(Base):
     __tablename__ = "customers"
@@ -26,14 +29,11 @@ class Customer(Base):
 class Pizza(Base):
     __tablename__ = "pizzas"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    base_price_cents: Mapped[int] = mapped_column(Integer, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    description = Column(Text)
+    price = Column(DECIMAL(5, 2), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
 
 
 class Order(Base):

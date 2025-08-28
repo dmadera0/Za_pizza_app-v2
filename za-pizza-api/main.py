@@ -11,7 +11,6 @@ from sqlalchemy import select
 import models
 import schemas
 from db import SessionLocal, engine
-from . import models, schemas
 
 # Create tables automatically (development only — in production, use Alembic migrations)
 models.Base.metadata.create_all(bind=engine)
@@ -19,7 +18,8 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Za Pizza API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React dev server
+    allow_origins=["http://localhost:5173",
+    "http://127.0.0.1:5173"],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,11 +53,13 @@ def list_pizzas(db: Session = Depends(get_db)):
             "id": p.id,
             "name": p.name,
             "description": p.description,
-            "price": float(p.price),
-            "created_at": p.created_at
+            "price": float(p.price),   # convert from Decimal to JSON-friendly float
+            "created_at": p.created_at.isoformat()
         }
         for p in pizzas
     ]
+
+
 
 # --------------------
 # Customers
