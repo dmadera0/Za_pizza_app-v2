@@ -1,4 +1,7 @@
 import { Link, Routes, Route } from "react-router-dom";
+import OrderNowPage from "./pages/OrderNowPage";
+import MenuPage from "./pages/MenuPage";
+import RecentOrdersPage from "./pages/RecentOrdersPage";
 
 function App() {
   return (
@@ -6,9 +9,7 @@ function App() {
       {/* Navbar */}
       <nav className="bg-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center">
-            🍕 Za Pizza POS
-          </h1>
+          <h1 className="text-2xl font-bold flex items-center">🍕 Za Pizza POS</h1>
           <ul className="flex space-x-6">
             <li>
               <Link to="/order" className="text-gray-700 hover:text-red-500 font-medium">
@@ -33,9 +34,9 @@ function App() {
       <div className="max-w-4xl mx-auto mt-8">
         <Routes>
           <Route path="/" element={<h2>Welcome to Za Pizza POS!</h2>} />
-          <Route path="/order" element={<h2>Order Now Page</h2>} />
-          <Route path="/menu" element={<h2>Menu Page</h2>} />
-          <Route path="/recent-orders" element={<h2>Recent Orders Page</h2>} />
+          <Route path="/order" element={<OrderNowPage />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/recent-orders" element={<RecentOrdersPage />} />
         </Routes>
       </div>
     </div>
