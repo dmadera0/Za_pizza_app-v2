@@ -1,63 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { fetchPizzas } from "../api";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ for navigation
+import { getPizzas } from "../api";
+import "../App.css";
 
 interface Pizza {
   id: number;
   name: string;
   description: string;
-  price: number;
+  price: string;
 }
 
-const MenuPage: React.FC = () => {
+export default function MenuPage() {
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // ✅ hook
 
   useEffect(() => {
-    const loadPizzas = async () => {
-      try {
-        const data = await fetchPizzas();
-        setPizzas(data);
-      } catch (err) {
-        console.error("Failed to fetch pizzas", err);
-        setError("Could not load menu. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPizzas();
+    getPizzas()
+      .then(setPizzas)
+      .catch((err) => console.error("Failed to fetch pizzas", err));
   }, []);
 
-  if (loading) return <p>Loading menu...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  const handleOrderNow = (pizzaId: number) => {
+    // navigate to order page and pass the pizzaId
+    navigate(`/order/${pizzaId}`);
+  };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-      <h1 style={{ textAlign: "center" }}>🍕 Pizza Menu</h1>
-      <div style={{ display: "grid", gap: "1.5rem", marginTop: "2rem" }}>
+    <div className="menu-page">
+      <h2>🍕 Pizza Menu</h2>
+
+      <div className="pizza-list">
         {pizzas.map((pizza) => (
-          <div
-            key={pizza.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              padding: "1rem",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-              backgroundColor: "#fff",
-            }}
-          >
-            <h2 style={{ margin: "0 0 0.5rem" }}>{pizza.name}</h2>
-            <p style={{ margin: "0 0 1rem", color: "#555" }}>
-              {pizza.description}
-            </p>
-            <strong style={{ fontSize: "1.1rem" }}>
-              ${pizza.price.toFixed(2)}
-            </strong>
+          <div key={pizza.id} className="pizza-card">
+            <h3>{pizza.name}</h3>
+            <p className="description">{pizza.description}</p>
+            <p className="price">${pizza.price}</p>
+            <button
+              className="order-btn"
+              onClick={() => handleOrderNow(pizza.id)}
+            >
+              Order Now
+            </button>
           </div>
         ))}
       </div>
     </div>
   );
-};
-
-export default MenuPage;
+}

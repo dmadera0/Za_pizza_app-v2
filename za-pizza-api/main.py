@@ -90,33 +90,40 @@ def get_customer(customer_id: int, db: Session = Depends(get_db)):
 # --------------------
 @app.post("/orders", response_model=schemas.OrderResponse)
 def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
-    # Get latest order to generate the next order number
+    # Find or create customer by name
+    customer = db.scalar(select(models.Customer).where(models.Customer.name == order.customer_name))
+    if not customer:
+        customer = models.Customer(name=order.customer_name)
+        db.add(customer)
+        db.commit()
+        db.refresh(customer)
+
+    # Get latest order number
     latest = db.scalar(select(models.Order).order_by(models.Order.id.desc()))
     next_number = (latest.number + 1) if latest else 1001
 
-    # Load pizzas referenced in the order
+    # Load pizzas
     pizza_ids = [item.pizza_id for item in order.items]
     pizzas = {
-        p.id: p
-        for p in db.scalars(select(models.Pizza).where(models.Pizza.id.in_(pizza_ids))).all()
+        p.id: p for p in db.scalars(select(models.Pizza).where(models.Pizza.id.in_(pizza_ids))).all()
     }
-
     if not pizzas:
         raise HTTPException(status_code=400, detail="Invalid pizza IDs")
 
-    total = 0
+    # Build order items
+    total_cents = 0
     order_items = []
     for item in order.items:
         if item.pizza_id not in pizzas:
             raise HTTPException(status_code=400, detail=f"Pizza {item.pizza_id} not found")
         pizza = pizzas[item.pizza_id]
-        line_total = pizza.base_price_cents * item.quantity
-        total += line_total
+        line_total = int(pizza.price * 100) * item.quantity
+        total_cents += line_total
         order_items.append(
             models.OrderItem(
                 pizza_id=pizza.id,
                 quantity=item.quantity,
-                unit_price_cents=pizza.base_price_cents,
+                unit_price_cents=int(pizza.price * 100),
                 line_total_cents=line_total,
             )
         )
@@ -124,8 +131,8 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
     # Create the order
     new_order = models.Order(
         number=next_number,
-        customer_id=order.customer_id,
-        total_cents=total,
+        customer_id=customer.id,
+        total_cents=total_cents,
         status="placed",
         items=order_items,
     )
@@ -139,7 +146,11 @@ def create_order(order: schemas.OrderCreate, db: Session = Depends(get_db)):
         "total_cents": new_order.total_cents,
         "status": new_order.status,
         "items": [
-            {"pizza_id": i.pizza_id, "quantity": i.quantity, "line_total": i.line_total_cents}
+            {
+                "pizza_id": i.pizza_id,
+                "quantity": i.quantity,
+                "line_total": i.line_total_cents / 100,  # return dollars
+            }
             for i in new_order.items
         ],
     }
@@ -152,10 +163,10 @@ def list_orders(db: Session = Depends(get_db)):
             "number": o.number,
             "total_cents": o.total_cents,
             "status": o.status,
+            "customer_name": o.customer.name if o.customer else None,  # ✅ Include customer
         }
         for o in orders
     ]
-
 
 @app.get("/orders/{order_id}", response_model=schemas.OrderDetailResponse)
 def get_order(order_id: int, db: Session = Depends(get_db)):
@@ -168,12 +179,16 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
         "number": order.number,
         "total_cents": order.total_cents,
         "status": order.status,
+        "customer_name": order.customer.name if order.customer else None,  # ✅ Include customer
         "items": [
-            {"pizza_id": i.pizza_id, "quantity": i.quantity, "line_total": i.line_total_cents}
+            {
+                "pizza_id": i.pizza_id,
+                "quantity": i.quantity,
+                "line_total": i.line_total_cents / 100,
+            }
             for i in order.items
         ],
     }
-
 
 
 # --------------------

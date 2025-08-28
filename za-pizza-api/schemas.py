@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
+from typing import Optional
+
 
 class CustomerListResponse(BaseModel):
     id: int
@@ -57,25 +59,25 @@ class OrderItemResponse(BaseModel):
         orm_mode = True
 
 
-class OrderListResponse(BaseModel):
-    order_id: int
-    number: int
-    total_cents: int
-    status: str
+# class OrderListResponse(BaseModel):
+#     order_id: int
+#     number: int
+#     total_cents: int
+#     status: str
 
-    class Config:
-        orm_mode = True
+#     class Config:
+#         orm_mode = True
 
 
-class OrderDetailResponse(BaseModel):
-    order_id: int
-    number: int
-    total_cents: int
-    status: str
-    items: List[OrderItemResponse]
+# class OrderDetailResponse(BaseModel):
+#     order_id: int
+#     number: int
+#     total_cents: int
+#     status: str
+#     items: List[OrderItemResponse]
 
-    class Config:
-        orm_mode = True
+#     class Config:
+#         orm_mode = True
 
 class PizzaBase(BaseModel):
     name: str
@@ -88,3 +90,26 @@ class PizzaOut(PizzaBase):
 
     class Config:
         orm_mode = True
+
+class OrderItemCreate(BaseModel):
+    pizza_id: int
+    quantity: int
+
+class OrderCreate(BaseModel):
+    customer_name: str    # instead of customer_id
+    items: list[OrderItemCreate]
+
+class OrderListResponse(BaseModel):
+    order_id: int
+    number: int
+    total_cents: int
+    status: str
+    customer_name: Optional[str]   # instead of str | None
+
+class OrderDetailResponse(BaseModel):
+    order_id: int
+    number: int
+    total_cents: int
+    status: str
+    customer_name: Optional[str]   # instead of str | None
+    items: list[dict]  # Or a proper OrderItem schema if you want to be stricter
