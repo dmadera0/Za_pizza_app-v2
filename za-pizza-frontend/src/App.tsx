@@ -1,4 +1,4 @@
-// src/App.tsx
+import { Link, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
@@ -11,41 +11,33 @@ function App() {
           </h1>
           <ul className="flex space-x-6">
             <li>
-              <a
-                href="#order"
-                className="text-gray-700 hover:text-red-500 font-medium"
-              >
+              <Link to="/order" className="text-gray-700 hover:text-red-500 font-medium">
                 Order Now
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#menu"
-                className="text-gray-700 hover:text-red-500 font-medium"
-              >
+              <Link to="/menu" className="text-gray-700 hover:text-red-500 font-medium">
                 Menu
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#orders"
-                className="text-gray-700 hover:text-red-500 font-medium"
-              >
+              <Link to="/recent-orders" className="text-gray-700 hover:text-red-500 font-medium">
                 Recent Orders
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
       </nav>
 
-      {/* Main content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-xl font-semibold mb-4">Welcome to Za Pizza POS!</h2>
-        <p className="text-gray-600">
-          Use the navigation above to place an order, view the menu, or check
-          recent orders.
-        </p>
-      </main>
+      {/* Page Content */}
+      <div className="max-w-4xl mx-auto mt-8">
+        <Routes>
+          <Route path="/" element={<h2>Welcome to Za Pizza POS!</h2>} />
+          <Route path="/order" element={<h2>Order Now Page</h2>} />
+          <Route path="/menu" element={<h2>Menu Page</h2>} />
+          <Route path="/recent-orders" element={<h2>Recent Orders Page</h2>} />
+        </Routes>
+      </div>
     </div>
   );
 }
