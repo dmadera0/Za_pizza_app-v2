@@ -1,38 +1,33 @@
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route, Outlet } from "react-router-dom";
 import OrderNowPage from "./pages/OrderNowPage";
 import MenuPage from "./pages/MenuPage";
 import RecentOrdersPage from "./pages/RecentOrdersPage";
 import OrderPage from "./pages/OrderPage";
+import "./App.css"; // ✅ make sure CSS classes apply
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <nav className="bg-white shadow-md">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center">🍕 Za Pizza POS</h1>
-          <ul className="flex space-x-6">
+      {/* 🔹 Sticky Navbar */}
+      <header className="header">
+        <h1>🍕 Za Pizza POS</h1>
+        <nav>
+          <ul className="nav-links">
             <li>
-              <Link to="/order" className="text-gray-700 hover:text-red-500 font-medium">
-                Order Now
-              </Link>
+              <Link to="/order">Order Now</Link>
             </li>
             <li>
-              <Link to="/menu" className="text-gray-700 hover:text-red-500 font-medium">
-                Menu
-              </Link>
+              <Link to="/menu">Menu</Link>
             </li>
             <li>
-              <Link to="/recent-orders" className="text-gray-700 hover:text-red-500 font-medium">
-                Recent Orders
-              </Link>
+              <Link to="/recent-orders">Recent Orders</Link>
             </li>
           </ul>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
-      {/* Page Content */}
-      <div className="max-w-4xl mx-auto mt-8">
+      {/* 🔹 Page Content */}
+      <main className="max-w-4xl mx-auto mt-8 px-4">
         <Routes>
           <Route path="/" element={<h2>Welcome to Za Pizza POS!</h2>} />
           <Route path="/order" element={<OrderNowPage />} />
@@ -40,7 +35,8 @@ function App() {
           <Route path="/recent-orders" element={<RecentOrdersPage />} />
           <Route path="/order/:pizzaId" element={<OrderPage />} />
         </Routes>
-      </div>
+        <Outlet />
+      </main>
     </div>
   );
 }

@@ -28,12 +28,39 @@ a:hover {
 }
 
 body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  color: #111827;
 }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+}
+.nav-links a {
+  margin-left: 1.5rem;
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+}
+.nav-links a:hover {
+  color: #111827;
+}
+
+
 
 h1 {
   font-size: 3.2em;

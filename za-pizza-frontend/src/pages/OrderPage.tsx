@@ -1,82 +1,74 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getPizzas, createOrder } from "../api";
+import "../App.css";
 
 interface Pizza {
   id: number;
   name: string;
-  price: number;
+  description: string;
+  price: string;
 }
 
 export default function OrderPage() {
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
-  const [customerName, setCustomerName] = useState("");
-  const [selectedPizza, setSelectedPizza] = useState<number | null>(null);
+  const [name, setName] = useState("");
+  const [pizzaId, setPizzaId] = useState<number | null>(null);
 
   useEffect(() => {
     getPizzas()
-      .then(setPizzas)
+      .then((data) => {
+        setPizzas(data);
+        if (data.length > 0) {
+          setPizzaId(data[0].id);
+        }
+      })
       .catch((err) => console.error("Failed to load pizzas", err));
   }, []);
 
-  const handleSubmit = async () => {
-    if (!customerName || !selectedPizza) {
-      alert("Please enter your name and select a pizza.");
-      return;
-    }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!pizzaId) return;
 
     try {
-      const payload = {
-        customer_name: customerName,   // ✅ matches backend
-        items: [
-          {
-            pizza_id: selectedPizza,   // ✅ matches backend
-            quantity: 1,
-          },
-        ],
-      };
-
-      await createOrder(payload);
+      await createOrder({
+        customer_name: name,
+        items: [{ pizza_id: pizzaId, quantity: 1 }],
+      });
       alert("✅ Order placed successfully!");
     } catch (err) {
       console.error("Order failed", err);
       alert("❌ Something went wrong while placing your order.");
     }
-  };
+  }
 
   return (
-    <div className="order-page">
+    <div className="order-form">
       <h2>🍕 Create Order</h2>
-      <div>
-        <label>
-          Your Name:
-          <input
-            type="text"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-          />
-        </label>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <label>Your Name:</label>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter your name"
+          required
+        />
 
-      <div>
-        <label>
-          Select Pizza:
-          <select
-            value={selectedPizza ?? ""}
-            onChange={(e) => setSelectedPizza(Number(e.target.value))}
-          >
-            <option value="" disabled>
-              -- Choose a pizza --
+        <label>Select Pizza:</label>
+        <select
+          value={pizzaId ?? ""}
+          onChange={(e) => setPizzaId(Number(e.target.value))}
+        >
+          {pizzas.map((pizza) => (
+            <option key={pizza.id} value={pizza.id}>
+              {pizza.name} (${pizza.price})
             </option>
-            {pizzas.map((pizza) => (
-              <option key={pizza.id} value={pizza.id}>
-                {pizza.name} (${pizza.price})
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+          ))}
+        </select>
 
-      <button onClick={handleSubmit}>✅ Complete Order</button>
+        <button type="submit" className="complete-btn">
+          ✅ Complete Order
+        </button>
+      </form>
     </div>
   );
 }
